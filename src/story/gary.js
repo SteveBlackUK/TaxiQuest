@@ -320,6 +320,7 @@ async function runHeist(game, attempt) {
     });
   });
   // Cleanup
+  if (st.has('keycard')) st.addItem('keycard', -st.count('keycard'));
   g.audio.siren(false);
   ui.timer(null);
   ui.meter('detect', { value: null });

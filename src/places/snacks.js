@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Place } from './kit.js';
+import { Place, mergeChildren } from './kit.js';
 import { toon, glowMat, drawTexture, neonText, FONT_DISPLAY, FONT_BODY, roundRect } from '../core/textures.js';
 import { placeCenter, streetPos } from '../world/layout.js';
 import { createCharacter } from '../world/characters.js';
@@ -222,6 +222,7 @@ export function buildSnacks(game) {
   const flame = new THREE.Mesh(new THREE.ConeGeometry(6, 14, 16), glowMat(0xff8a1f, 2.5, { transparent: true, opacity: 0.8 }));
   flame.rotation.x = Math.PI;
   flame.position.y = -20;
+  flame.userData.keep = true;
   G.add(flame);
   P.updaters.push((dt) => { flame.scale.set(1 + Math.sin(game.time * 20) * 0.06, 1 + Math.sin(game.time * 13) * 0.12, 1); });
   // Big sign on top
@@ -314,6 +315,8 @@ export function buildSnacks(game) {
     entry: new THREE.Vector3(cx - 28, 72, street),
   };
   P.windowDock = { pos: new THREE.Vector3(wx + 1.3 + 1.2, F - 0.2, dz), yaw: -Math.PI / 2 };
+  mergeChildren(G);
+  P.freeze();
   game.scene.add(P.group);
   return P;
 }

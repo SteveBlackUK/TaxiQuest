@@ -50,8 +50,7 @@ export class Drive {
     this.taxi.anchors.eyeDriver.add(g.camera);
     g.camera.position.set(0, 0, 0);
     g.camera.rotation.set(0, 0, 0);
-    g.camera.fov = 80;
-    g.camera.updateProjectionMatrix();
+    g.setFov(80);
     g.setCamera(this);
     g.addSystem(this);
     g.input.wantLock = true;

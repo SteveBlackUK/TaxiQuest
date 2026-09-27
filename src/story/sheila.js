@@ -105,7 +105,7 @@ export async function fareSheila(game) {
       kevinChar.root.parent && kevinChar.root.parent.remove(kevinChar.root);
       kevinChar.root.scale.setScalar(0.9);
       kevinChar.root.rotation.set(0, Math.PI, 0);
-      foot.hold(kevinChar.root, 0.18, -0.98, -0.85);
+      foot.hold(kevinChar.root, 0.16, -0.78, -0.8);
       kevinChar.lookAt(null);
       game.audio.play('success');
       game.audio.play('giggle');

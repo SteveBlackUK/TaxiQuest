@@ -38,8 +38,7 @@ export class Foot {
     this.vel.set(0, 0, 0);
     this.lastSafe.copy(this.pos);
     g.scene.attach(g.camera);
-    g.camera.fov = 75;
-    g.camera.updateProjectionMatrix();
+    g.setFov(75);
     g.camera.add(this.held);
     this.held.position.set(0, 0, 0);
     g.setCamera(this);

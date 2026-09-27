@@ -13,6 +13,7 @@ export function buildBankExterior(game) {
   const marble = toon(0xd8d0e8);
   const dark = toon(0x2a2438);
   const cx = -339, cz = c.z;
+  P.center = new THREE.Vector3(-320, 46, cz);
   const add = (x, y0, z, w, h, d, m) => {
     P.box(x, y0, z, w, h, d, m, { collide: false });
     game.city.addCollider({ minX: x - w / 2, maxX: x + w / 2, minY: y0, maxY: y0 + h, minZ: z - d / 2, maxZ: z + d / 2, tag: 'bank' });
@@ -28,6 +29,7 @@ export function buildBankExterior(game) {
   const coin = new THREE.Mesh(new THREE.CylinderGeometry(6, 6, 1, 32), glowMat(0xffd23f, 2));
   coin.rotation.x = Math.PI / 2;
   coin.position.set(cx, 166, cz);
+  coin.userData.keep = true;
   P.group.add(coin);
   P.updaters.push((dt) => { coin.rotation.z += dt * 0.8; });
   // gold bands
@@ -67,6 +69,7 @@ export function buildBankExterior(game) {
     entry: new THREE.Vector3(streetPos(4), 72, cz - 26),
   };
   P.spawn = { pos: new THREE.Vector3(-307, padY, cz), yaw: Math.PI / 2 };
+  P.freeze();
   game.scene.add(P.group);
   return P;
 }
@@ -144,6 +147,7 @@ export function buildBankInterior(game) {
   P.sign('EMPLOYEE OF THE MONTH: TELL-R', O.x + 18, O.y + 3.6, O.z - 28.06, Math.PI, { w: 5, h: 0.9, color: '#33f0ff', size: 60 });
   const keycard = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.04, 0.32), glowMat(0x33f0ff, 2.5));
   keycard.position.copy(L(19, -34)).add(new THREE.Vector3(0, 0.95, 0));
+  keycard.userData.keep = true;
   P.group.add(keycard);
   P.keycard = keycard;
   // Laser hall (x -14..13, z -50..-44)
@@ -155,6 +159,7 @@ export function buildBankInterior(game) {
   const laser = (x, y) => {
     const m = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.05, 6), laserM);
     m.position.copy(L(x, -47)).add(new THREE.Vector3(0, y, 0));
+    m.userData.keep = true;
     P.group.add(m);
     P.lasers.push({ minX: O.x + x - 0.05, maxX: O.x + x + 0.05, minY: O.y + y - 0.04, maxY: O.y + y + 0.04, minZ: O.z - 50, maxZ: O.z - 44, mesh: m });
   };
@@ -223,8 +228,9 @@ export function buildBankInterior(game) {
   });
   // Golden banana on a pedestal
   B(-22.6, -47.6, -21.4, -46.4, 0, 1.1, marble, { tag: 'low' });
-  const nana = new THREE.Mesh(new THREE.TorusGeometry(0.5, 0.15, 10, 20, Math.PI * 0.8), glowMat(0xffd23f, 1.8));
+  const nana = new THREE.Mesh(new THREE.TorusGeometry(0.5, 0.15, 10, 20, Math.PI * 0.8), toon(0xffb81a, { emissive: 0x4a2a00 }));
   nana.position.copy(L(-22, -47)).add(new THREE.Vector3(0, 1.6, 0));
+  nana.userData.keep = true;
   P.group.add(nana);
   P.goldnana = nana;
   P.updaters.push((dt) => { if (nana.parent) nana.rotation.y += dt * 1.5; });
@@ -273,6 +279,7 @@ export function buildBankInterior(game) {
   P.exitPos = L(0, -0.5).add(new THREE.Vector3(0, 1.4, 0));
   P.L = L;
   P.group.visible = false;
+  P.freeze();
   game.scene.add(P.group);
   return P;
 }

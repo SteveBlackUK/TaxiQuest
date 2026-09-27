@@ -113,6 +113,7 @@ export function buildRank(game) {
   P.group.add(beaconSign);
   const beaconLight = new THREE.Mesh(new THREE.SphereGeometry(0.22, 12, 10), glowMat(0xffd23f, 4, { unique: true }));
   beaconLight.position.set(hx, Y + 3.65, hz);
+  beaconLight.userData.keep = true;
   P.group.add(beaconLight);
   P.beaconLight = beaconLight;
   P.beaconPos = new THREE.Vector3(hx, Y + 1.4, hz);
@@ -188,6 +189,7 @@ export function buildRank(game) {
   P.spawn = { pos: new THREE.Vector3(cx - 6, Y, cz + 4), yaw: -Math.PI / 2 };
   P.shop = { pos: new THREE.Vector3(vx + 0.8, Y + 1.2, vz) };
   P.dispatch = { pos: new THREE.Vector3(bx, Y + 1.3, bz + 1.6) };
+  P.freeze();
   game.scene.add(P.group);
   return P;
 }

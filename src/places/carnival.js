@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Place, pad } from './kit.js';
+import { Place, pad, mergeChildren } from './kit.js';
 import { toon, glowMat, drawTexture, neonText, toonGradient } from '../core/textures.js';
 import { placeCenter, streetPos } from '../world/layout.js';
 import { createCharacter } from '../world/characters.js';
@@ -45,9 +45,10 @@ export function buildCarnival(game) {
   });
   const floors = [floorTex('#3a2458', '#4a2d70'), floorTex('#26305a', '#2f3c70'), floorTex('#3d2046', '#4d2858')];
   const side = toon(0x2d2446);
+  const floorMats = floors.map((t) => [side, new THREE.MeshToonMaterial({ map: t, gradientMap: toonGradient() }), side]);
   let fi = 0;
   for (const [k, [x, z, r, y, rim]] of Object.entries(PLATS)) {
-    const mat = [side, new THREE.MeshToonMaterial({ map: floors[fi++ % floors.length], gradientMap: toonGradient() }), side];
+    const mat = floorMats[fi++ % floorMats.length];
     const d = P.disc(c.x + x, Y + y, c.z + z, r, mat, { rim, thick: 1.2 });
     P.plats[k] = { key: k, x: c.x + x, z: c.z + z, r, y: Y + y, group: d };
   }
@@ -174,6 +175,7 @@ export function buildCarnival(game) {
       fw.add(gon);
       gondolas.push({ gon, a });
     }
+    mergeChildren(wheel);
     P.updaters.push((dt) => {
       wheel.rotation.x += dt * 0.15;
       for (const g of gondolas) {
@@ -218,20 +220,27 @@ export function buildCarnival(game) {
     P.group.add(f);
   }
 
-  // Balloons
-  const balloonMats = [0xff3d8b, 0x33f0ff, 0xffd23f, 0x6dff8a, 0xb14dff].map((col) => toon(col));
+  // Balloons (one instanced mesh)
+  const bcols = [0xff3d8b, 0x33f0ff, 0xffd23f, 0x6dff8a, 0xb14dff];
+  const balloonGeo = new THREE.SphereGeometry(0.9, 12, 10);
+  balloonGeo.scale(1, 1.2, 1);
+  const balloonMesh = new THREE.InstancedMesh(balloonGeo, toon(0xffffff), 26);
   const balloons = [];
+  const bc = new THREE.Color();
   for (let i = 0; i < 26; i++) {
-    const b = new THREE.Mesh(new THREE.SphereGeometry(0.9, 12, 10), balloonMats[i % 5]);
-    b.scale.y = 1.2;
-    b.position.copy(W(rand(-50, 50), rand(8, 30), rand(-50, 60)));
-    b.userData.base = b.position.clone();
-    b.userData.ph = rand(0, 10);
-    P.group.add(b);
-    balloons.push(b);
+    balloons.push({ base: W(rand(-50, 50), rand(8, 30), rand(-50, 60)), ph: rand(0, 10) });
+    balloonMesh.setColorAt(i, bc.setHex(bcols[i % 5]));
   }
+  balloonMesh.instanceColor.needsUpdate = true;
+  balloonMesh.frustumCulled = false;
+  P.group.add(balloonMesh);
+  const bm = new THREE.Matrix4();
   P.updaters.push(() => {
-    for (const b of balloons) b.position.y = b.userData.base.y + Math.sin(game.time * 0.6 + b.userData.ph) * 1.5;
+    balloons.forEach((b, i) => {
+      bm.makeTranslation(b.base.x, b.base.y + Math.sin(game.time * 0.6 + b.ph) * 1.5, b.base.z);
+      balloonMesh.setMatrixAt(i, bm);
+    });
+    balloonMesh.instanceMatrix.needsUpdate = true;
   });
   // Sparkles in the low-grav field
   const sparkGeo = new THREE.BufferGeometry();
@@ -254,6 +263,7 @@ export function buildCarnival(game) {
   };
   P.spawn = { pos: W(-7, 0, 55), yaw: -Math.PI / 2 + 0.3 };
   P.sheilaSpot = W(-5, 0, 60);
+  P.freeze();
   game.scene.add(P.group);
   return P;
 }

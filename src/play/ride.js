@@ -161,8 +161,7 @@ export class Ride {
       this.taxi.anchors.eyeRear.add(g.camera);
       g.camera.position.set(0, 0, 0);
       g.camera.rotation.set(0, 0, 0);
-      g.camera.fov = 74;
-      g.camera.updateProjectionMatrix();
+      g.setFov(74);
       g.setCamera(this);
       g.input.wantLock = false;
       g.input.releaseLock();
@@ -178,6 +177,8 @@ export class Ride {
   end() {
     const g = this.game;
     this.active = false;
+    g.ffwd = 1;
+    if (this._canFF) { this._canFF = false; g.ui.hint(null); }
     g.removeSystem(this);
     if (this.passenger) this.setPassenger(false);
     this.taxi.setInside(false);
@@ -361,6 +362,11 @@ export class Ride {
     } else this.bounceY = damp(this.bounceY, 0, 4, dt);
     this.applyTransform(dt);
     this.taxi.update(dt, this.speed);
+    // Hold Tab to fast-forward the trip once nobody is talking.
+    const g = this.game;
+    const canFF = this.passenger && (this.mode === 'goto' || this.mode === 'depart') && !g.ui.line && !g.chase.active && !g.ui.modalOpen;
+    if (canFF !== this._canFF) { this._canFF = canFF; g.ui.hint(canFF ? 'Hold <span class="kbd">TAB</span> to fast-forward the ride' : null); }
+    g.ffwd = canFF && g.input.down('Tab') ? 4 : 1;
     // Ambient chatter and honks while cruising
     if (this.passenger && this.speed > 8 && !this.game.ui.line && !this.game.chase.active) {
       this.barkT = (this.barkT ?? 12) - dt;

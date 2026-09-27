@@ -150,7 +150,7 @@ export class UI {
     if (!el) {
       el = document.createElement('div');
       el.id = 'bark';
-      el.style.cssText = 'position:absolute;left:14px;bottom:60px;max-width:min(520px,70vw);padding:10px 14px;border-radius:10px;background:rgba(12,8,30,0.85);border-left:3px solid #ff3d8b;font-weight:800;font-size:16px;line-height:1.35;pointer-events:none;transition:opacity 0.3s';
+      el.style.cssText = 'position:absolute;left:14px;top:118px;max-width:min(420px,60vw);padding:10px 14px;border-radius:10px;background:rgba(12,8,30,0.85);border-left:3px solid #ff3d8b;font-weight:800;font-size:16px;line-height:1.35;pointer-events:none;transition:opacity 0.3s';
       document.getElementById('hud').appendChild(el);
     }
     el.innerHTML = `<span style="font-family:var(--display);color:var(--yellow);font-size:13px">${esc(name)}</span><br>${esc(text).replace(/\*(.+?)\*/g, '<b style="color:var(--cyan)">$1</b>')}`;
@@ -408,6 +408,7 @@ export class UI {
       <span class="kbd">1-4</span><span>Pick dialogue choices</span>
       <span class="kbd">CLICK</span><span>Throw / grab / press buttons</span>
       <span class="kbd">R-CLICK</span><span>Throw Space Floss (if you have some)</span>
+      <span class="kbd">TAB</span><span>Hold to fast-forward a ride</span>
       <span class="kbd">ESC</span><span>Pause</span>
     </div>`;
   }
@@ -445,9 +446,19 @@ export class UI {
         <div class="buttons">
           <button class="btn alt" data-v="quit">Quit to title</button>
           <button class="btn alt" data-v="settings">Settings</button>
+          <button class="btn alt" data-v="pockets">Pockets</button>
           <button class="btn" data-v="resume">Resume</button>
         </div></div>`, { keys: { Escape: 'resume', Enter: 'resume' } });
       if (v === 'settings') { await this.settings(); continue; }
+      if (v === 'pockets') {
+        const st = this.game.state;
+        const names = { carl: 'Carl the Crocodile', sheila: 'Sheila the Kangaroo', gary: 'Gary the Gorilla', lenny: 'Lenny the Sloth' };
+        const rows = Object.entries(names).map(([k, n]) => `<div class="row"><span>${n}</span><span class="v">${st.d.ratings[k] ? this.stars(st.d.ratings[k]) : '—'}</span></div>`).join('');
+        await this.modal(`<div class="card wide"><div class="kicker">POCKETS</div><h1>What you're carrying</h1>
+          ${this.inventoryHtml()}<h2 style="margin-top:14px">Driver ratings</h2>${rows}
+          <div class="buttons"><button class="btn" data-v="ok">Back</button></div></div>`, { keys: { Escape: 'ok', Enter: 'ok' } });
+        continue;
+      }
       return v;
     }
   }

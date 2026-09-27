@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { toon, glowMat } from '../core/textures.js';
+import { mergeChildren } from '../places/kit.js';
 
 // A giant sky whale that drifts over the city. Purely for wonder.
 export function createWhale() {
@@ -44,6 +45,7 @@ export function createWhale() {
     m.position.set(Math.cos(a * 3) * 9, 8 + Math.sin(i) * 1.5, -30 + i * 3.6);
     body.add(m);
   }
+  mergeChildren(body);
   let t = 0;
   return {
     group: g,

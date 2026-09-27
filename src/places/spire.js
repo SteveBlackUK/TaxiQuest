@@ -12,6 +12,7 @@ export function buildSpire(game) {
   const TOP = 332;     // mayor's deck
   P.R = R; P.TOP = TOP;
   P.center = new THREE.Vector3(c.x, R, c.z);
+  P.alwaysVisible = true;
   P.killY = R - 30;
   const shell = toon(0x1c1a2a);
   const white = toon(0xe8ecf2);
@@ -82,6 +83,7 @@ export function buildSpire(game) {
   P.finalPadPower = 19;
   P.finalPad.col.pad = 0; // locked until the levers are pulled
   P.finalPad.g.visible = false;
+  for (const m of P.finalPad.g.userData.parts) { m.userData.keep = true; m.visible = false; }
 
   // Mayor's deck on top
   P.disc(c.x, TOP, c.z, 16, white, { rim: 0xff3040, thick: 1.2 });
@@ -177,6 +179,7 @@ export function buildSpire(game) {
   const light2 = new THREE.PointLight(0xc0c0ff, 250, 70, 1.3);
   light2.position.set(c.x, R + 8, c.z + 30);
   P.group.add(light2);
+  P.freeze();
   game.scene.add(P.group);
   return P;
 }

@@ -40,6 +40,7 @@ export function buildChapel(game) {
   const heart = heartMesh(0xff3d8b, 2.2);
   heart.position.set(cxw, Y + 19, cz);
   heart.rotation.y = Math.PI / 2;
+  heart.userData.keep = true;
   P.group.add(heart);
   P.updaters.push((dt) => { heart.rotation.y += dt; heart.scale.setScalar(1 + Math.sin(game.time * 4) * 0.08); });
   // stained glass window
@@ -97,6 +98,7 @@ export function buildChapel(game) {
     entry: new THREE.Vector3(streetPos(12), 72, cz - 28),
   };
   P.spawn = { pos: new THREE.Vector3(cx + 15, Y, cz), yaw: Math.PI / 2 };
+  P.freeze();
   game.scene.add(P.group);
   return P;
 }

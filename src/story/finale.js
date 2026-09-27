@@ -114,6 +114,7 @@ export async function finale(game) {
         ui.objective('Network down! Take the <b>gold launch pad</b> to the Mayor\'s deck');
         S.finalPad.col.pad = S.finalPadPower;
         S.finalPad.g.visible = true;
+        for (const m of S.finalPad.g.userData.parts) m.visible = true;
         game.audio.play('success');
         ui.bark('CARL (over the radio)', 'The RoboCabs are dropping like flies! Get up there, kid!');
         S.tip.material.color.setRGB(0.3, 3, 1);
@@ -163,8 +164,11 @@ export async function finale(game) {
   ride.teleport(hoverPos, 0);
   game.taxi.setDoor(true);
   game.audio.music('boss');
+  foot.pos.set(mayor.root.position.x + 0.6, S.TOP, mayor.root.position.z + 6.5);
+  foot.vel.set(0, 0, 0);
   foot.yaw = Math.atan2(-(mayor.root.position.x - foot.pos.x), -(mayor.root.position.z - foot.pos.z));
-  foot.pitch = 0.05;
+  foot.pitch = 0.12;
+  ui.objective('Talk the <b>mayor</b> out of the RoboCab ban');
   await K.say('mayor', 'WELL, WELL, WELL. A *HUMAN*. IN NEO-SERENGETI. HOW... RETRO.',
     'YOU HAVE DISABLED MY NETWORK. IRRELEVANT. AT MIDNIGHT I WILL SIMPLY REBOOT IT.',
     'ROBOCABS ARE EFFICIENT. ROBOCABS DO NOT SHED. ROBOCABS DO NOT EAT THE PASSENGERS.');

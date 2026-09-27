@@ -39,12 +39,21 @@ export function setupWorld(game) {
     spire: buildSpire(game),
   };
   // Places animate even when you're not standing in them (they're visible from the sky).
+  // Far-away places and characters are hidden; the fog would swallow them anyway.
+  const cam = new THREE.Vector3();
   game.addSystem({
     update: (dt) => {
+      game.camera.getWorldPosition(cam);
       for (const p of Object.values(game.places)) {
+        if (p.center && p !== game.places.bank) {
+          const d = cam.distanceTo(p.center);
+          if (!p.alwaysVisible) p.group.visible = d < 640;
+          const near = d < 170;
+          for (const a of p.actors) a.root.visible = near;
+        }
         if (!p.group.visible) continue;
         if (game.foot.active && game.foot.level === p) continue; // the foot controller runs it
-        for (const a of p.actors) a.update(dt);
+        for (const a of p.actors) if (a.root.visible) a.update(dt);
         for (const fn of p.updaters) fn(dt, null);
       }
     },
@@ -81,6 +90,8 @@ async function titleScreen(game) {
   const btns = el.querySelector('.title-buttons');
   const st = game.state;
   titleFlyover(game);
+  game.setFov(72);
+  if (game.touch) el.querySelector('.title-foot').textContent = 'Touch controls are on. Best with sound on.';
   game.ui.showHud(false);
   el.classList.remove('hidden');
   await game.ui.fade(false, 1.2);

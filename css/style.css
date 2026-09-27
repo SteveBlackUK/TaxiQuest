@@ -202,7 +202,7 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #07040f; col
 #app { touch-action: none; }
 #dialogue { z-index: 6; }
 #touch { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
-#touch[data-mode="none"] > *, #touch[data-mode="ride"] > :not(.t-pause) { display: none; }
+#touch[data-mode="none"] > *, #touch[data-mode="ride"] > :not(.t-pause) { display: none !important; }
 #touch .t-look { position: absolute; right: 0; top: 0; width: 62%; height: 100%; pointer-events: auto; }
 #touch .t-stick { position: absolute; left: 22px; bottom: 22px; width: 140px; height: 140px; border-radius: 50%; background: rgba(255, 255, 255, 0.07); border: 2px solid rgba(51, 240, 255, 0.5); pointer-events: auto; }
 #touch .t-knob { position: absolute; left: 50%; top: 50%; width: 60px; height: 60px; margin: -30px 0 0 -30px; border-radius: 50%; background: rgba(51, 240, 255, 0.45); box-shadow: 0 0 16px rgba(51, 240, 255, 0.6); }

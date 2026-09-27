@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { toon, glowMat, drawTexture, neonText, FONT_DISPLAY, roundRect } from '../core/textures.js';
+import { mergeGeometries } from '../core/geom.js';
 
 // Helpers for building walkable places with matching colliders (world coordinates).
 export class Place {
@@ -21,6 +22,7 @@ export class Place {
     const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
     m.position.set(x, y0 + h / 2, z);
     parent.add(m);
+    if (parent === this.group) m.userData.boxStatic = true;
     if (collide) {
       const b = { minX: x - w / 2, maxX: x + w / 2, minY: y0, maxY: y0 + h, minZ: z - d / 2, maxZ: z + d / 2, tag, mesh: m };
       this.colliders.push(b);
@@ -31,25 +33,23 @@ export class Place {
 
   // Round platform approximated by a few boxes for collision.
   disc(x, yTop, z, r, mat, { thick = 1, rim = null, collide = true, segs = 32 } = {}) {
-    const g = new THREE.Group();
-    g.position.set(x, yTop, z);
-    this.group.add(g);
+    const G = this.group;
     const top = new THREE.Mesh(new THREE.CylinderGeometry(r, r * 0.92, thick, segs), mat);
-    top.position.y = -thick / 2;
-    g.add(top);
+    top.position.set(x, yTop - thick / 2, z);
+    G.add(top);
     const under = new THREE.Mesh(new THREE.ConeGeometry(r * 0.9, r * 0.7, segs), toon(0x2a2340));
     under.rotation.x = Math.PI;
-    under.position.y = -thick - r * 0.35;
-    g.add(under);
+    under.position.set(x, yTop - thick - r * 0.35, z);
+    G.add(under);
     if (rim) {
       const ring = new THREE.Mesh(new THREE.TorusGeometry(r, 0.12, 6, segs * 2), glowMat(rim, 2.5));
       ring.rotation.x = Math.PI / 2;
-      ring.position.y = -0.1;
-      g.add(ring);
+      ring.position.set(x, yTop - 0.1, z);
+      G.add(ring);
       const glow = new THREE.Mesh(new THREE.TorusGeometry(r * 0.6, 0.06, 6, segs * 2), glowMat(rim, 1.6));
       glow.rotation.x = Math.PI / 2;
-      glow.position.y = -thick - r * 0.5;
-      g.add(glow);
+      glow.position.set(x, yTop - thick - r * 0.5, z);
+      G.add(glow);
     }
     const cols = [];
     if (collide) {
@@ -61,9 +61,12 @@ export class Place {
         cols.push(c);
       }
     }
-    g.userData.cols = cols;
-    return g;
+    return { userData: { cols }, position: new THREE.Vector3(x, yTop, z) };
   }
+
+  // Merge static meshes that share a material into one mesh each (far fewer draw calls).
+  // Anything animated or toggled later is flagged userData.keep and left alone.
+  freeze() { mergeChildren(this.group); }
 
   interact(pos, prompt, use, opts = {}) {
     const it = { pos, prompt, use, ...opts };
@@ -105,6 +108,7 @@ export class Place {
     rail.position.set((x0 + x1) / 2, y + h, (z0 + z1) / 2);
     rail.rotation.y = -Math.atan2(z1 - z0, x1 - x0);
     g.add(rail);
+    mergeChildren(g);
     // invisible wall so you can't just walk off (you can still jump it)
     const minX = Math.min(x0, x1) - 0.15, maxX = Math.max(x0, x1) + 0.15, minZ = Math.min(z0, z1) - 0.15, maxZ = Math.max(z0, z1) + 0.15;
     this.colliders.push({ minX, maxX, minY: y, maxY: y + h, minZ, maxZ, tag: 'rail' });
@@ -130,14 +134,15 @@ export function pad(place, x, yTop, z, r, power, color = 0x6dff8a, to = null) {
   g.position.set(x, yTop, z);
   place.group.add(g);
   const base = new THREE.Mesh(new THREE.CylinderGeometry(r, r, 0.3, 24), toon(0x222233));
-  base.position.y = 0.15;
-  g.add(base);
-  const top = new THREE.Mesh(new THREE.CylinderGeometry(r * 0.85, r * 0.85, 0.06, 24), glowMat(color, 2.2, { unique: true }));
-  top.position.y = 0.32;
-  g.add(top);
-  const arrows = new THREE.Mesh(new THREE.ConeGeometry(r * 0.35, r * 0.5, 4), glowMat(color, 3, { unique: true }));
+  base.position.set(x, yTop + 0.15, z);
+  place.group.add(base);
+  const top = new THREE.Mesh(new THREE.CylinderGeometry(r * 0.85, r * 0.85, 0.06, 24), glowMat(color, 2.2));
+  top.position.set(x, yTop + 0.32, z);
+  place.group.add(top);
+  const arrows = new THREE.Mesh(new THREE.ConeGeometry(r * 0.35, r * 0.5, 4), glowMat(color, 3));
   arrows.position.y = 0.9;
   g.add(arrows);
+  g.userData.parts = [base, top];
   const col = { minX: x - r * 0.8, maxX: x + r * 0.8, minY: yTop, maxY: yTop + 0.35, minZ: z - r * 0.8, maxZ: z + r * 0.8, pad: power, padTo: to, tag: 'pad' };
   place.colliders.push(col);
   place.updaters.push((dt) => {
@@ -145,4 +150,21 @@ export function pad(place, x, yTop, z, r, power, color = 0x6dff8a, to = null) {
     arrows.rotation.y += dt * 2;
   });
   return { g, col };
+}
+
+export function mergeChildren(group) {
+  const buckets = new Map();
+  for (const m of [...group.children]) {
+    if (!m.isMesh || m.isInstancedMesh || Array.isArray(m.material) || m.userData.keep) continue;
+    if (!buckets.has(m.material)) buckets.set(m.material, []);
+    buckets.get(m.material).push(m);
+  }
+  for (const [mat, list] of buckets) {
+    if (list.length < 2) continue;
+    const geos = list.map((m) => { m.updateMatrix(); const g = m.geometry.clone(); g.applyMatrix4(m.matrix); return g; });
+    const merged = new THREE.Mesh(mergeGeometries(geos), mat);
+    merged.renderOrder = Math.max(...list.map((m) => m.renderOrder));
+    for (const m of list) group.remove(m);
+    group.add(merged);
+  }
 }

@@ -120,6 +120,7 @@ export class Game {
     }
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
+    if (this.baseFov) this.setFov(this.baseFov);
   }
 
   // Render each character's head to an image for the dialogue box.
@@ -149,7 +150,7 @@ export class Game {
       ch.root.updateMatrixWorld(true);
       const head = new THREE.Vector3();
       ch.headPivot.getWorldPosition(head);
-      const scale = id === 'mayor' ? 1.9 : id === 'kevin' ? 0.8 : id === 'gary' ? 1.25 : id === 'carl' ? 1.45 : 1;
+      const scale = id === 'mayor' ? 1.9 : id === 'kevin' ? 0.8 : id === 'gary' ? 1.25 : id === 'carl' ? 1.45 : id === 'flamingo' ? 0.72 : 1;
       const fwd = id === 'carl' ? 0.2 : 0.05;
       cam.position.set(head.x + 0.45 * scale, head.y + 0.12 * scale, head.z - 1.25 * scale);
       cam.lookAt(head.x, head.y + 0.03 * scale, head.z - fwd);
@@ -178,6 +179,12 @@ export class Game {
   addSystem(s) { this.systems.add(s); }
   removeSystem(s) { this.systems.delete(s); }
   setCamera(ctl) { this.cameraCtl = ctl; }
+  // Portrait screens get a wider vertical field of view so you can still see sideways.
+  setFov(f) {
+    this.baseFov = f;
+    const fov = this.camera.aspect < 1 ? Math.min(100, f * 1.3) : f;
+    if (this.camera.fov !== fov) { this.camera.fov = fov; this.camera.updateProjectionMatrix(); }
+  }
 
   addShake(v) { this.shake = Math.max(this.shake, v); }
 
@@ -188,7 +195,7 @@ export class Game {
       let dt = (now - last) / 1000;
       last = now;
       if (dt > 0.1) dt = 0.1;
-      dt *= this.timeScale || 1;
+      dt *= (this.timeScale || 1) * (this.ffwd || 1);
       this.fps = this.fps * 0.95 + (1 / Math.max(dt, 0.001)) * 0.05;
       this.frame(dt);
     };
