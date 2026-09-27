@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Taxi Quest</title>
+  <meta name="description" content="A first-person flying-taxi RPG. Wild animal cabbies, ridiculous quests, one neon sky city.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "./vendor/three/build/three.module.js",
+      "three/addons/": "./vendor/three/addons/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <div id="app">
+    <canvas id="view"></canvas>
+
+    <div id="hud" class="hidden">
+      <div id="hud-stats">
+        <div class="hud-row"><span id="hud-credits" class="credits">₡ 20</span><span id="hud-heat" class="heat"></span></div>
+        <div class="hud-row"><span id="hud-level" class="lvl">LV 1</span><div class="xpbar"><div id="hud-xp"></div></div></div>
+        <div class="hud-row pills"><span id="hud-charm">CHA 1</span><span id="hud-nerve">NRV 1</span><span id="hud-reflex">RFX 1</span></div>
+      </div>
+      <div id="hud-objective" class="hidden"><div class="label">OBJECTIVE</div><div id="hud-objective-text"></div></div>
+      <div id="hud-top">
+        <div id="hud-timer" class="hidden"></div>
+        <div id="hud-meters"></div>
+      </div>
+      <div id="crosshair" class="hidden"></div>
+      <div id="hud-prompt" class="hidden"></div>
+      <div id="hud-hint" class="hidden"></div>
+      <div id="toasts"></div>
+      <div id="banner" class="hidden"><div class="banner-kicker"></div><div class="banner-title"></div><div class="banner-sub"></div></div>
+    </div>
+
+    <div id="dialogue" class="hidden">
+      <div class="dlg-portrait"><img alt=""></div>
+      <div class="dlg-body">
+        <div class="dlg-name"><span class="n"></span><span class="species"></span></div>
+        <div class="dlg-text"></div>
+        <div class="dlg-choices"></div>
+        <div class="dlg-next">▼</div>
+      </div>
+    </div>
+
+    <div id="lockhint" class="hidden">Click to look around</div>
+    <div id="modal" class="hidden"></div>
+    <div id="fade"></div>
+
+    <div id="title" class="hidden">
+      <div class="title-inner">
+        <div class="logo"><span class="l1">TAXI</span><span class="l2">QUEST</span></div>
+        <div class="tagline">Wild rides in the flying cabs of Neo-Serengeti</div>
+        <div class="title-buttons"></div>
+        <div class="title-foot">Mouse + keyboard. Best with sound on.</div>
+      </div>
+    </div>
+
+    <div id="boot">
+      <div class="boot-logo">TAXI QUEST</div>
+      <div id="boot-msg">Warming up the hover engines…</div>
+      <button id="boot-start" class="btn big hidden">Click to start</button>
+    </div>
+  </div>
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
