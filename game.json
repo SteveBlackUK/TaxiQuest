@@ -5,5 +5,12 @@
   "added": "2026-09-27",
   "playtime": "About 90 minutes",
   "controls": "Mouse and keyboard. Touch works too.",
-  "listed": true
+  "listed": true,
+  "made": {
+    "tool": "Claude Code",
+    "model": "",
+    "time": "About 2 to 3 hours",
+    "created": "2026-09-27",
+    "prompt": "new repo, make a browser based game. one shot it until it is fun and playable. Make a first person RPG game for the browser, where you go on amazing and quirky rides in taxis. The drivers are wild animals and make you do quests like rob a bank, get a happy meal, save a child, and so on. based in a sci fi city and taxis can fly."
+  }
 }
