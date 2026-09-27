@@ -50,7 +50,7 @@ python3 -m http.server 8000
 
 Opening `index.html` straight from disk won't work because browsers block ES module imports over `file://`.
 
-To host it on GitHub Pages, go to Settings, Pages, and deploy from the `main` branch root.
+To host it on GitHub Pages, go to the repo's Settings, then Pages, choose "Deploy from a branch", pick the branch the game is on and the `/ (root)` folder, and save. The site appears at `https://<user>.github.io/TaxiQuest/` a minute or two later. Free GitHub accounts can only do this for public repos. The empty `.nojekyll` file tells Pages to serve the files as they are without running Jekyll.
 
 ## How it's built
 
