@@ -1,0 +1,44 @@
+# Uploads this game to https://one-shot-games.com/<SLUG>/
+# Run it from the Actions tab: "Deploy to One Shot Games" > Run workflow.
+#
+# The server side (games container, upload key, secrets) is described in the
+# one-shot-games repo's SETUP.md. This repo needs three Actions secrets:
+#   GAMES_HOST      server IP or hostname
+#   GAMES_HOST_KEY  the line printed by: ssh-keyscan -t ed25519 <GAMES_HOST>
+#   GAMES_SSH_KEY   the upload-only private key; it can write to the games folder and nothing else
+
+name: Deploy to One Shot Games
+
+on:
+  workflow_dispatch:
+
+env:
+  SLUG: taxiquest
+  # Everything the browser needs. Nothing else in the repo is uploaded.
+  FILES: index.html game.json thumb.jpg css src vendor
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Upload
+        env:
+          GAMES_HOST: ${{ secrets.GAMES_HOST }}
+          GAMES_HOST_KEY: ${{ secrets.GAMES_HOST_KEY }}
+          GAMES_SSH_KEY: ${{ secrets.GAMES_SSH_KEY }}
+        run: |
+          set -euo pipefail
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$GAMES_SSH_KEY" > ~/.ssh/games_upload
+          chmod 600 ~/.ssh/games_upload
+          printf '%s\n' "$GAMES_HOST_KEY" > ~/.ssh/known_hosts
+
+          mkdir -p "dist/$SLUG"
+          cp -R $FILES "dist/$SLUG/"
+
+          # The server pins this key to rrsync inside the games folder, so the
+          # destination path is relative to that folder.
+          rsync -rlz --delete -e "ssh -i ~/.ssh/games_upload" "dist/$SLUG" "deploy@$GAMES_HOST:"
+          echo "Live at https://one-shot-games.com/$SLUG/"

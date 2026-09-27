@@ -50,11 +50,17 @@ python3 -m http.server 8000
 
 Opening `index.html` straight from disk won't work because browsers block ES module imports over `file://`.
 
-To host it on GitHub Pages, go to the repo's Settings, then Pages, choose "Deploy from a branch", pick the branch the game is on and the `/ (root)` folder, and save. The site appears at `https://<user>.github.io/TaxiQuest/` a minute or two later. Free GitHub accounts can only do this for public repos. The empty `.nojekyll` file tells Pages to serve the files as they are without running Jekyll.
+## Hosting
+
+The game is published to https://one-shot-games.com/taxiquest/. Running the **Deploy to One Shot Games** workflow in the Actions tab uploads `index.html`, `game.json`, `thumb.jpg`, `css/`, `src/` and `vendor/` to the games server; nothing else in the repo goes online. The server side and the three secrets the workflow needs are described in the `one-shot-games` repo's SETUP.md.
+
+`game.json` and `thumb.jpg` are the game's card on the one-shot-games.com landing page, and `thumb.jpg` is also the preview image when the link is shared.
+
+Because every path is relative, the game also runs from any static host or subfolder.
 
 ## How it's built
 
-- **three.js r186** (vendored in `vendor/three`), with UnrealBloom for the neon glow. The Graphics setting in the pause menu turns bloom off for slower machines.
+- **three.js r186** (vendored in `vendor/three-r186`; the version is in the folder name so browsers and CDNs can cache it for a year), with UnrealBloom for the neon glow. The Graphics setting in the pause menu turns bloom off for slower machines.
 - **The city** is procedural: a 14 by 14 block grid of instanced towers drawn with a custom window shader, merged neon sign atlases, 400 flying cars, searchlights, billboards and a sky dome.
 - **Characters** are built from primitives with toon shading, and their dialogue portraits are rendered from the same models at startup.
 - **Audio** is all WebAudio synthesis: a small step sequencer plays a different track per scene, and every honk, blip and banana splat is generated on the fly.

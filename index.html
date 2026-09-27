@@ -3,8 +3,18 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <script>
+    // Hosted under a path like /taxiquest, the relative file paths below only resolve with a trailing slash.
+    if (!/\/$|\.html$/.test(location.pathname)) location.replace(location.pathname + '/' + location.search + location.hash);
+  </script>
   <title>Taxi Quest</title>
   <meta name="description" content="A first-person flying-taxi RPG. Wild animal cabbies, ridiculous quests, one neon sky city.">
+  <meta property="og:title" content="Taxi Quest">
+  <meta property="og:description" content="A first-person flying-taxi RPG. Wild animal cabbies, ridiculous quests, one neon sky city.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://one-shot-games.com/taxiquest/">
+  <meta property="og:image" content="https://one-shot-games.com/taxiquest/thumb.jpg">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
@@ -12,8 +22,8 @@
   <script type="importmap">
   {
     "imports": {
-      "three": "./vendor/three/build/three.module.js",
-      "three/addons/": "./vendor/three/addons/"
+      "three": "./vendor/three-r186/build/three.module.js",
+      "three/addons/": "./vendor/three-r186/addons/"
     }
   }
   </script>
