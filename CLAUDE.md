@@ -1,5 +1,7 @@
 # Taxi Quest
 
+This repo is no longer where Taxi Quest is worked on. It moved to `SteveBlackUK/one-shot-games` under `games/taxiquest`, and changes belong there. The notes below are kept as a record.
+
 A first-person RPG in the browser: you ride flying taxis driven by animals and help with their favours. It's plain ES modules and a vendored three.js with no build step, published at https://one-shot-games.com/taxiquest/. The owner's son plays it, so keep jokes silly and cartoonish, with no swearing and nothing gory, even in the bank heist.
 
 ## Running and testing

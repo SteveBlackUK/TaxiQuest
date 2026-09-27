@@ -1,5 +1,7 @@
 # Taxi Quest
 
+> **Taxi Quest has moved** to [SteveBlackUK/one-shot-games](https://github.com/SteveBlackUK/one-shot-games), in `games/taxiquest`, with its full history. Make changes there. This repo is kept only as a record.
+
 A first-person RPG for the browser about riding flying taxis in Neo-Serengeti, a neon sky city where every cab driver is a wild animal and every one of them needs a favor.
 
 You arrive with 20 credits and a suitcase of socks. Doris the tortoise runs dispatch at Taxi Rank 7. Hail a cab, help the driver, get rated, earn tips and XP, level up, repeat.
