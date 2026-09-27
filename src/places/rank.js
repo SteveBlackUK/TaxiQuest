@@ -42,6 +42,7 @@ export function buildRank(game) {
   // Taxi bay markings
   P.box(x1 - 1.5, Y, cz, 3, 0.02, 10, glowMat(0xffd23f, 1.2), { collide: false });
   P.sign('TAXI RANK 7', x1 - 0.2, Y + 5.2, cz, -Math.PI / 2, { w: 9, h: 2, color: '#ffd23f' });
+  P.sign('TAXI RANK 7', x1 - 0.1, Y + 5.2, cz, Math.PI / 2, { w: 9, h: 2, color: '#ffd23f' });
   const poleM = toon(0x3a3550);
   P.box(x1 - 0.5, Y, cz - 5, 0.3, 5, 0.3, poleM);
   P.box(x1 - 0.5, Y, cz + 5, 0.3, 5, 0.3, poleM);
@@ -63,6 +64,22 @@ export function buildRank(game) {
   P.doris = doris;
   const stool = P.box(bx, Y, bz - 0.2, 0.8, 0.9, 0.8, toon(0x222222), { collide: false });
   stool.visible = true;
+
+  // Ambient regulars
+  const doc = createCharacter('flamingo');
+  P.addActor(doc, x1 - 7, Y, z0 + 2.2, Math.PI * 0.85);
+  P.flamingo = doc;
+  const bot = createCharacter('sweep');
+  P.addActor(bot, cx, Y, cz, 0);
+  P.sweeper = bot;
+  let botA = 0;
+  P.updaters.push((dt) => {
+    botA += dt * 0.12;
+    const bxp = cx + 2 + Math.cos(botA) * 9, bzp = cz + Math.sin(botA * 2) * 6;
+    const dx = bxp - bot.root.position.x, dz = bzp - bot.root.position.z;
+    bot.root.position.set(bxp, Y, bzp);
+    if (Math.abs(dx) + Math.abs(dz) > 1e-4) bot.root.rotation.y = Math.atan2(-dx, -dz);
+  });
 
   // Vend-o-matic
   const vx = cx - 17, vz = cz + 6;

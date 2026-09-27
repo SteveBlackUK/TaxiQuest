@@ -504,6 +504,60 @@ const BUILDERS = {
     c.maxYaw = 0;
   },
 
+  flamingo(c) {
+    const pink = toon(0xff7ab8), light = toon(0xffc0dc), dark = toon(0x1a1a1a), legM = toon(0xe86a9a);
+    // Standing on one leg, obviously.
+    const hip = new THREE.Vector3(0, 1.0, 0.05);
+    limb(c.body, hip, new THREE.Vector3(0, 0.5, 0.02), 0.025, legM);
+    limb(c.body, new THREE.Vector3(0, 0.5, 0.02), new THREE.Vector3(0, 0.03, 0), 0.025, legM);
+    part(c.body, S(0.07), legM, [0, 0.02, -0.05], [0, 0, 0], [1, 0.3, 1.6]);
+    limb(c.body, new THREE.Vector3(0.06, 1.0, 0.08), new THREE.Vector3(0.08, 0.72, -0.12), 0.022, legM);
+    limb(c.body, new THREE.Vector3(0.08, 0.72, -0.12), new THREE.Vector3(0.07, 0.9, 0.1), 0.022, legM);
+    c.torso.position.set(0, 1.15, 0.05);
+    part(c.torso, S(0.24), pink, [0, 0, 0], [0.25, 0, 0], [1, 0.75, 1.45]);
+    part(c.torso, new THREE.ConeGeometry(0.12, 0.3, 8), pink, [0, 0.05, 0.36], [-1.2, 0, 0]);
+    for (const sx of [-1, 1]) part(c.torso, S(0.17), light, [sx * 0.2, 0.02, 0.05], [0.2, 0, 0], [0.35, 0.6, 1.3]);
+    // S-curved neck
+    const neck = [[0, 0.2, -0.28], [0, 0.35, -0.34], [0, 0.48, -0.28], [0, 0.58, -0.2], [0, 0.7, -0.2]];
+    for (const [x, y, z] of neck) part(c.torso, S(0.055), pink, [x, y, z]);
+    c.headPivot.position.set(0, 1.15 + 0.8, -0.2 + 0.05);
+    const h = c.head;
+    part(h, S(0.1), pink, [0, 0, 0], [0, 0, 0], [0.9, 0.95, 1.1]);
+    const beak = new THREE.Group();
+    beak.position.set(0, -0.02, -0.08);
+    h.add(beak);
+    part(beak, new THREE.CylinderGeometry(0.035, 0.028, 0.12, 8), light, [0, 0, -0.05], [Math.PI / 2, 0, 0]);
+    part(beak, new THREE.ConeGeometry(0.028, 0.1, 8), dark, [0, -0.04, -0.13], [Math.PI * 0.8, 0, 0]);
+    const jaw = new THREE.Group();
+    jaw.position.set(0, -0.03, -0.05);
+    h.add(jaw);
+    part(jaw, new THREE.BoxGeometry(0.03, 0.01, 0.08), dark, [0, -0.01, -0.04]);
+    c.jaw = jaw;
+    for (const sx of [-1, 1]) eye(h, sx * 0.065, 0.03, -0.04, 0.025, { iris: 0xffd23f });
+    // doctor's head mirror
+    part(h, new THREE.CylinderGeometry(0.05, 0.05, 0.01, 16), glowMat(0xdde8ff, 1.2), [0, 0.08, -0.08], [1.2, 0, 0]);
+    part(h, new THREE.TorusGeometry(0.1, 0.008, 4, 20), toon(0x333333), [0, 0.04, 0], [Math.PI / 2 - 0.3, 0, 0]);
+    c.maxYaw = 1.4;
+    c.extras.push((dt, t) => { c.body.position.y = Math.sin(t * 1.3) * 0.01; });
+  },
+
+  sweeper(c) {
+    const metal = toon(0x5a8ab8);
+    c.torso.position.y = 0.1;
+    part(c.torso, new THREE.CylinderGeometry(0.28, 0.32, 0.5, 16), metal, [0, 0.25, 0]);
+    part(c.torso, new THREE.CylinderGeometry(0.3, 0.3, 0.05, 16), glowMat(0x6dff8a, 1.6), [0, 0.02, 0]);
+    c.headPivot.position.set(0, 0.62, 0);
+    part(c.head, new THREE.SphereGeometry(0.24, 14, 8, 0, Math.PI * 2, 0, Math.PI / 2), toon(0xd8dce8));
+    part(c.head, S(0.07), glowMat(0x33f0ff, 2.5), [0, 0.1, -0.2]);
+    const broom = new THREE.Group();
+    broom.position.set(0.3, 0.35, -0.1);
+    c.body.add(broom);
+    part(broom, new THREE.CylinderGeometry(0.015, 0.015, 0.9, 5), toon(0xb88a5a), [0, 0, -0.25], [1.1, 0, 0]);
+    part(broom, new THREE.BoxGeometry(0.25, 0.12, 0.06), toon(0xe8c860), [0, -0.3, -0.55], [0.4, 0, 0]);
+    c.extras.push((dt, t) => { broom.rotation.y = Math.sin(t * 6) * 0.5; });
+    c.maxYaw = 1;
+  },
+
   mayor(c) {
     const metal = toon(0xb8c0d0);
     const dark = toon(0x40485a);
@@ -543,6 +597,8 @@ export const CAST = {
   mayor: { kind: 'mayor', name: 'Mayor Mechawhiskers', species: 'Robot Cat · Mayor', voice: 'mayor', portrait: 'mayor' },
   clerk: { kind: 'robot', name: 'SNACK-BOT 9000', species: 'McSnackers Crew Member', voice: 'robot', portrait: 'clerk', opts: { cap: 0xd8203a } },
   teller: { kind: 'robot', name: 'TELL-R', species: 'Bank Teller Unit', voice: 'robot', portrait: 'teller', opts: { color: 0xc8b070, shirt: 0x2a3a6a } },
+  flamingo: { kind: 'flamingo', name: 'Dr. Plumeria', species: 'Flamingo · Carl\'s Doctor', voice: 'roo', portrait: 'flamingo' },
+  sweep: { kind: 'sweeper', name: 'SWEEP-E', species: 'Janitor Unit · Rank 7', voice: 'robot', portrait: null },
   you: { name: 'You', species: '', voice: 'you', portrait: null },
 };
 

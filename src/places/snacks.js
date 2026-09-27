@@ -255,11 +255,11 @@ export function buildSnacks(game) {
   P.box(wx + 3.1, F + 0.7, fz, 1.8, 1.6, 0.3, shell, { collide: false });
   P.box(wx, F + 0.62, fz - 0.35, 4.6, 0.12, 0.9, trimM, { collide: false });           // counter
   P.box(wx, F - 0.3, cz - 19, 7.6, 3.5, 0.2, toon(0x6a0d12), { collide: false });      // back wall
-  const innerLight = new THREE.PointLight(0xfff0d0, 18, 9, 1.5);
+  const innerLight = new THREE.PointLight(0xfff0d0, 7, 7, 1.5);
   innerLight.position.set(wx, F + 2.4, fz + 2.2);
   P.group.add(innerLight);
   const clerk = createCharacter('clerk');
-  P.addActor(clerk, wx, F, fz + 1.4, Math.PI);
+  P.addActor(clerk, wx, F, fz + 1.4, 0);
   P.clerk = clerk;
   P.sign('PICK-UP', wx, F + 3.9, fz - 0.3, Math.PI, { w: 4.5, h: 1.1, color: '#ffd23f' });
 
@@ -281,27 +281,27 @@ export function buildSnacks(game) {
   P.sign('ORDER HERE', bx, F + 3.0, bz - 0.05, Math.PI, { w: 3.3, h: 0.7, color: '#6dff8a' });
   P.board = board;
 
-  // Toy-o-tron to the east of the window.
-  const tx = wx + 6.2;
+  // Toy-o-tron mounted beside the pick-up window.
+  const tx = wx + 3.1;
   const toy = new ToyOTron();
-  const toyMesh = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 1.33), new THREE.MeshBasicMaterial({ map: toy.tex, color: new THREE.Color(1.3, 1.3, 1.3) }));
-  toyMesh.position.set(tx, F + 1.9, fz - 0.2);
+  const toyMesh = new THREE.Mesh(new THREE.PlaneGeometry(1.75, 0.68), new THREE.MeshBasicMaterial({ map: toy.tex, color: new THREE.Color(1.15, 1.15, 1.15) }));
+  toyMesh.position.set(tx, F + 1.75, fz - 0.17);
   toyMesh.rotation.y = Math.PI;
   P.group.add(toyMesh);
-  const dome = new THREE.Mesh(new THREE.SphereGeometry(0.8, 16, 12), glowMat(0x88e8ff, 0.6, { transparent: true, opacity: 0.35 }));
-  dome.position.set(tx, F + 0.9, fz - 0.2);
+  const dome = new THREE.Mesh(new THREE.SphereGeometry(0.42, 16, 12), glowMat(0x88e8ff, 0.5, { transparent: true, opacity: 0.3 }));
+  dome.position.set(tx, F + 0.95, fz - 0.55);
   P.group.add(dome);
-  for (let i = 0; i < 8; i++) {
-    const cap = new THREE.Mesh(new THREE.SphereGeometry(0.16, 8, 6), toon([0xff3d8b, 0x33f0ff, 0xffd23f, 0x6dff8a][i % 4]));
-    cap.position.set(tx + Math.cos(i * 2.3) * 0.4, F + 0.6 + (i % 3) * 0.18, fz - 0.2 + Math.sin(i * 2.3) * 0.4);
+  for (let i = 0; i < 7; i++) {
+    const cap = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 6), toon([0xff3d8b, 0x33f0ff, 0xffd23f, 0x6dff8a][i % 4]));
+    cap.position.set(tx + Math.cos(i * 2.3) * 0.2, F + 0.75 + (i % 3) * 0.12, fz - 0.55 + Math.sin(i * 2.3) * 0.2);
     P.group.add(cap);
   }
-  P.box(tx, F - 0.8, fz - 0.2, 1.2, 1.2, 1.2, toon(0xff3d8b), { collide: false });
+  P.box(tx, F - 0.3, fz - 0.55, 0.7, 0.85, 0.7, toon(0xff3d8b), { collide: false });
   P.toy = toy;
   P.toyMesh = toyMesh;
   P.windowPos = new THREE.Vector3(wx, F + 1.3, fz + 0.4);
   P.boardPos = new THREE.Vector3(bx, F + 1.35, bz);
-  P.toyPos = new THREE.Vector3(tx, F + 1.5, fz - 0.2);
+  P.toyPos = new THREE.Vector3(tx, F + 1.45, fz - 0.2);
 
   // Taxi faces +x (yaw -pi/2): its right side (your side) faces the booth.
   // Eye sits 1.3m behind the taxi center, so offset the dock so you're level with things.

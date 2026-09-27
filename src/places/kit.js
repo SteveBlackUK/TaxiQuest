@@ -71,7 +71,7 @@ export class Place {
     return it;
   }
 
-  sign(text, x, y, z, ry, { w = 6, h = 1.5, color = '#ff3d8b', bg = 'rgba(10,5,25,0.9)', size = 90, font = FONT_DISPLAY, intensity = 1.8, parent = this.group } = {}) {
+  sign(text, x, y, z, ry, { w = 6, h = 1.5, color = '#ff3d8b', bg = 'rgba(10,5,25,0.9)', size = 90, font = FONT_DISPLAY, intensity = 1.8, parent = this.group, double = false } = {}) {
     const tex = drawTexture(1024, Math.round(1024 * h / w), (g, W, H) => {
       g.fillStyle = bg;
       roundRect(g, 6, 6, W - 12, H - 12, 24);
@@ -82,7 +82,7 @@ export class Place {
       g.shadowBlur = 0;
       neonText(g, text, W / 2, H / 2 + 4, color, size, { font, maxW: W - 80, glow: 22 });
     });
-    const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: tex, transparent: true, color: new THREE.Color(intensity, intensity, intensity), side: THREE.DoubleSide }));
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: tex, transparent: true, color: new THREE.Color(intensity, intensity, intensity), side: double ? THREE.DoubleSide : THREE.FrontSide }));
     m.position.set(x, y, z);
     m.rotation.y = ry;
     parent.add(m);

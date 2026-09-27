@@ -16,6 +16,7 @@ export async function fareSheila(game) {
   game.taxi.tv('ads', ['ZERO-G CARNIVAL: Float like a butterfly, scream like a goat!', 'SPACE FLOSS: Sticky. Sweet. Legally a food.', 'LOST A JOEY? Call 1-800-BOUNCE']);
   game.audio.music('carnival');
   ride.cruise();
+  ride.barks = ['Hold onto your hat, love!', 'Oi! Road hog! MOVE IT!', 'Kevin, if you can hear me, STAY PUT!', 'Bounce, bounce, bounce!'];
   await K.wait(0.6);
   ui.banner('FARE #2', 'Sheila the Kangaroo', 'Where\'s Kevin?', 2.6);
   await K.wait(1.2);
@@ -104,7 +105,7 @@ export async function fareSheila(game) {
       kevinChar.root.parent && kevinChar.root.parent.remove(kevinChar.root);
       kevinChar.root.scale.setScalar(0.9);
       kevinChar.root.rotation.set(0, Math.PI, 0);
-      foot.hold(kevinChar.root, 0.05, -1.25, -0.9);
+      foot.hold(kevinChar.root, 0.18, -0.98, -0.85);
       kevinChar.lookAt(null);
       game.audio.play('success');
       game.audio.play('giggle');

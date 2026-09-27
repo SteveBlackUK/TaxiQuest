@@ -102,10 +102,10 @@ export class Chase {
     this.active = true;
     g.taxi.root.add(this.group);
     g.taxi.setInside(false);
-    g.taxi.setDoor(true);
+    g.taxi.setDoor(false);
     const ride = g.ride;
-    ride.camOffset = new THREE.Vector3(0.95, 0.2, -0.35);
-    ride.lookOverride = { yaw: Math.PI * 0.93, pitch: -0.05, follow: true };
+    ride.camOffset = new THREE.Vector3(1.25, 0.62, -0.5);
+    ride.lookOverride = { yaw: Math.PI + 0.22, pitch: -0.06, follow: true };
     g.canvas.style.cursor = 'crosshair';
     g.addSystem(this);
     this.hitFlash = document.getElementById('hitflash') || (() => {
@@ -146,7 +146,7 @@ export class Chase {
 
   spawnEnemy() {
     const obj = this.kind === 'police' ? policeDrone() : roboCab();
-    const slot = new THREE.Vector3(rand(-10, 10), rand(-2.5, 6), rand(16, 30));
+    const slot = new THREE.Vector3(rand(-3, 13), rand(-1, 7), rand(15, 28));
     obj.position.set(slot.x * 2, slot.y + rand(-4, 8), 90);
     this.group.add(obj);
     this.enemies.push({ obj, slot, hp: this.hp, state: 'approach', t: rand(1.5, 3), phase: rand(0, 10), stun: 0, dying: 0, spin: 0 });

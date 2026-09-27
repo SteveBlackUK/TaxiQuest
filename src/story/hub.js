@@ -34,6 +34,17 @@ const TIPS = {
   99: 'Try a joyride. Nobody\'s timing you now.',
 };
 
+const FLAMINGO = {
+  1: ['I\'m Dr. Plumeria. Carl\'s doctor. If you see Carl, tell him that fasting for forty years is *not how biology works*.'],
+  2: ['Carl ATE? After forty years? I need to update his chart. And possibly write a paper. Possibly win a prize.'],
+  3: ['I stand on one leg because it\'s efficient.', 'Also because I\'ve been waiting for a cab for six hours and my other leg filed a complaint.'],
+  4: ['Professional opinion: robbing banks is terrible for your heart rate.', '...Did you get the golden banana though? Asking for a friend. The friend is me.'],
+  5: ['A robot mayor banning animals? Robots don\'t even have legs.', 'I have ONE leg and I\'m doing fine.'],
+  99: ['Everyone\'s healthier since you saved the rank. Except Carl. Carl eats McSnackers every day now. Every. Day.'],
+};
+const SWEEP = ['BEEP. YOU ARE STANDING ON MY CLEAN SPOT.', 'I HAVE SWEPT THIS DECK 40,000 TIMES. IT IS NEVER CLEAN. I AM NEVER FREE.',
+  'PLEASE DO NOT FEED THE PIGEONS. THEY ARE SURVEILLANCE DRONES.', 'HAVE A SPARKLING DAY. SPARKLING IS MY FAVORITE WORD.', 'BEEP BOOP. THAT IS ROBOT FOR "HI". PLEASE DO NOT TELL THE MAYOR I SAID HI.'];
+
 export async function hub(game, chapter) {
   const K = kit(game);
   const rank = game.places.rank;
@@ -80,6 +91,22 @@ export async function hub(game, chapter) {
       }
       busy = false;
     });
+    D.register('flamingo', rank.flamingo);
+    D.register('sweep', rank.sweeper);
+    let sweepI = 0;
+    rank.interact(() => rank.flamingo.root.position.clone().setY(rank.flamingo.root.position.y + 1.6), 'Talk to Dr. Plumeria', async () => {
+      if (busy) return;
+      busy = true;
+      await D.say('flamingo', ...(FLAMINGO[chapter] || FLAMINGO[99]));
+      busy = false;
+    }, { radius: 3 });
+    rank.interact(() => rank.sweeper.root.position.clone().setY(rank.sweeper.root.position.y + 0.6), 'Talk to SWEEP-E', async () => {
+      if (busy) return;
+      busy = true;
+      game.audio.play('robot');
+      await D.say('sweep', SWEEP[sweepI++ % SWEEP.length]);
+      busy = false;
+    }, { radius: 2.6 });
     rank.interact(rank.shop.pos, 'Use the Vend-o-Matic', async () => {
       if (busy) return;
       busy = true;

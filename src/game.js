@@ -12,6 +12,8 @@ import { createSky } from './world/sky.js';
 import { Traffic } from './world/traffic.js';
 import { createTaxi } from './world/taxi.js';
 import { createCharacter, CAST } from './world/characters.js';
+import { createWhale } from './world/whale.js';
+import { TouchControls, isTouchDevice } from './core/touch.js';
 import { clamp } from './core/util.js';
 
 export class Game {
@@ -20,6 +22,7 @@ export class Game {
     this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: false, powerPreference: 'high-performance' });
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.05;
+    this.renderer.info.autoReset = false;
     this.scene = new THREE.Scene();
     this.scene.fog = new THREE.FogExp2(0x2a0f3a, 0.0019);
     this.scene.background = new THREE.Color(0x14081f);
@@ -40,6 +43,10 @@ export class Game {
     this.fps = 60;
     this.pixelRatio = Math.min(window.devicePixelRatio || 1, 1.5);
     window.addEventListener('resize', () => this.resize());
+    if (isTouchDevice()) {
+      this.touch = new TouchControls(this);
+      document.body.classList.add('touch');
+    }
     this.state.onChange(() => this.ui.refreshStats());
   }
 
@@ -64,6 +71,8 @@ export class Game {
     await nextFrame();
     this.traffic = new Traffic();
     this.scene.add(this.traffic.group);
+    this.whale = createWhale();
+    this.scene.add(this.whale.group);
 
     progress('Waxing the taxi…');
     await nextFrame();
@@ -179,6 +188,7 @@ export class Game {
       let dt = (now - last) / 1000;
       last = now;
       if (dt > 0.1) dt = 0.1;
+      dt *= this.timeScale || 1;
       this.fps = this.fps * 0.95 + (1 / Math.max(dt, 0.001)) * 0.05;
       this.frame(dt);
     };
@@ -186,6 +196,7 @@ export class Game {
   }
 
   frame(dt) {
+    if (this.touch) this.touch.update();
     const blocked = this.paused || this.ui.modalOpen;
     if (!blocked) {
       this.time += dt;
@@ -200,6 +211,7 @@ export class Game {
       }
       for (const s of [...this.systems]) s.update(dt);
       this.traffic.update(dt, this.time);
+      this.whale.update(dt);
       this.city.update(dt, this.time);
       this.ui.update(dt);
     }
@@ -220,6 +232,7 @@ export class Game {
   }
 
   render() {
+    this.renderer.info.reset();
     if (this.state.settings.quality === 'low') this.renderer.render(this.scene, this.camera);
     else this.composer.render();
   }

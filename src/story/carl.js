@@ -7,6 +7,7 @@ export async function fareCarl(game) {
   const K = kit(game);
   const { D, ui, st, ride, P } = K;
   const carl = makeDriver(game, 'carl');
+  game.dialogue.register('clerk', P.snacks.clerk);
   let vibe = 0;
 
   ui.objective('Your taxi is on its way…');
@@ -16,6 +17,7 @@ export async function fareCarl(game) {
   game.taxi.tv('ads', ['McSNACKERS: Try the new Quantum Nuggets!', 'SNAPPY MEALS: Now with Robo-Gerald! Collect all 1!', 'CROCODILE DENTAL: We\'ll be gentle. Probably.']);
   game.audio.music('carl');
   ride.cruise();
+  ride.barks = ['HEY! I\'M FLYIN\' HERE!', 'Smell that? That\'s the smell of fries in my future.', 'Forty years... forty years...', 'Look at that billboard. She\'s calling to me.'];
   await K.wait(0.6);
   ui.banner('FARE #1', 'Carl the Crocodile', 'One Snappy Meal, Hold the Regrets', 2.6);
   await K.wait(1.4);

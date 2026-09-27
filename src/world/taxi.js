@@ -131,7 +131,13 @@ export function createTaxi({ robo = false, color = YELLOW } = {}) {
   ipillar(-1.0, -1.1, 0.8, -0.55); ipillar(1.0, -1.1, 0.8, -0.55);
   ipillar(-1.0, 0.45, 0.72, 0); ipillar(1.0, 0.45, 0.72, 0);
   ipillar(-1.0, 1.98, 0.8, 0.5); ipillar(1.0, 1.98, 0.8, 0.5);
-  add(interior, new THREE.BoxGeometry(2.1, 0.05, 2.9), toon(0x1e1830), 0, 1.72, 0.5);
+  // Panoramic glass roof so you can see the towers overhead.
+  const roofGlass = new THREE.Mesh(new THREE.PlaneGeometry(1.9, 2.6), new THREE.MeshBasicMaterial({ color: 0x5a70c0, transparent: true, opacity: 0.12, depthWrite: false, side: THREE.DoubleSide }));
+  roofGlass.rotation.x = Math.PI / 2;
+  roofGlass.position.set(0, 1.74, 0.55);
+  interior.add(roofGlass);
+  for (const z of [-0.78, 0.45, 1.9]) add(interior, new THREE.BoxGeometry(2.12, 0.08, 0.14), toon(0x221c33), 0, 1.74, z);
+  for (const x of [-1.0, 1.0]) add(interior, new THREE.BoxGeometry(0.12, 0.08, 2.8), toon(0x221c33), x, 1.74, 0.55);
   // Faint windshield so you know it's glass
   const ws = new THREE.Mesh(new THREE.PlaneGeometry(2.0, 0.85), new THREE.MeshBasicMaterial({ color: 0x6080ff, transparent: true, opacity: 0.05, depthWrite: false }));
   ws.position.set(0, 1.38, -1.1);
@@ -167,8 +173,10 @@ export function createTaxi({ robo = false, color = YELLOW } = {}) {
   const meter = add(dash, new THREE.BoxGeometry(0.34, 0.14, 0.12), toon(0x111111), 0.12, 1.17, -1.32);
   const meterFace = add(dash, new THREE.PlaneGeometry(0.3, 0.11), new THREE.MeshBasicMaterial({ map: meterCanvasTex, color: new THREE.Color(1.6, 1.6, 1.6) }), 0.12, 1.17, -1.255, -0.1, 0, 0);
   // Rear-view mirror + fuzzy dice
-  add(interior, new THREE.BoxGeometry(0.36, 0.1, 0.05), toon(0x111111), 0, 1.6, -0.92);
-  add(interior, new THREE.PlaneGeometry(0.32, 0.075), lambert(0x8fa6d8, { emissive: 0x223355 }), 0, 1.6, -0.894);
+  const mirror = new THREE.Group();
+  interior.add(mirror);
+  add(mirror, new THREE.BoxGeometry(0.36, 0.1, 0.05), toon(0x111111), 0, 1.6, -0.92);
+  add(mirror, new THREE.PlaneGeometry(0.32, 0.075), lambert(0x8fa6d8, { emissive: 0x223355 }), 0, 1.6, -0.894);
   const dice = new THREE.Group();
   dice.position.set(0.1, 1.55, -0.94);
   interior.add(dice);
@@ -191,8 +199,8 @@ export function createTaxi({ robo = false, color = YELLOW } = {}) {
     if (wide) {
       add(g, new THREE.BoxGeometry(w, 0.8, 0.14), seatMat, 0, 1.0, 0.36).rotation.x = -0.15;
     } else {
-      add(g, new THREE.BoxGeometry(w, 0.5, 0.14), seatMat, 0, 0.88, 0.3).rotation.x = -0.12;
-      add(g, new THREE.BoxGeometry(w + 0.02, 0.04, 0.16), seatTrim, 0, 1.14, 0.33);
+      add(g, new THREE.BoxGeometry(w - 0.06, 0.42, 0.14), seatMat, 0, 0.84, 0.3).rotation.x = -0.12;
+      add(g, new THREE.BoxGeometry(w - 0.04, 0.04, 0.16), seatTrim, 0, 1.06, 0.33);
     }
     add(g, new THREE.BoxGeometry(w + 0.02, 0.03, 0.02), seatTrim, 0, 0.65, -0.3);
     return g;
@@ -204,7 +212,7 @@ export function createTaxi({ robo = false, color = YELLOW } = {}) {
   // Taxi TV on the back of the front passenger seat
   const tvTex = drawTexture(320, 192, () => {});
   const tvGroup = new THREE.Group();
-  tvGroup.position.set(0.5, 0.88, 0.12);
+  tvGroup.position.set(0.5, 0.84, 0.12);
   tvGroup.rotation.x = -0.22;
   interior.add(tvGroup);
   add(tvGroup, new THREE.BoxGeometry(0.44, 0.28, 0.04), toon(0x111111), 0, 0, 0);
@@ -235,14 +243,15 @@ export function createTaxi({ robo = false, color = YELLOW } = {}) {
   mk('rearMid', 0, 0.64, 1.25);
   mk('rearRight', 0.5, 0.64, 1.25);
   mk('eyeRear', 0.36, 1.5, 1.3);
-  mk('eyeDriver', -0.5, 1.42, -0.26);
+  mk('eyeDriver', -0.5, 1.5, -0.12);
   mk('roof', 0, 1.82, 0.5);
 
   // ---------- API ----------
   const state = { fare: 0, tvMode: 'ads', tvTimer: 0, tvScroll: 0, tvMessages: [], tvIdx: 0, doorOpen: 0, doorTarget: 0, inside: false, t: 0, meterRate: 1.2 };
 
   const taxi = {
-    root, body, shell, always, interior, anchors, thrusters, state, dice, bobbleAnchor, passSeat,
+    root, body, shell, always, interior, anchors, thrusters, state, dice, mirror, bobbleAnchor, passSeat,
+    setDriving(v) { mirror.visible = !v; dice.visible = !v; },
     setInside(v) {
       state.inside = v;
       shell.visible = !v;

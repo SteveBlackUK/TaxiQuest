@@ -39,6 +39,7 @@ export async function finale(game) {
   game.taxi.tv('news', ['MAYOR: "At midnight, every cab in Neo-Serengeti becomes a RoboCab."', 'Animal cabbies "extremely not okay with this."', 'Mayor spotted buying a suspicious amount of toys.']);
   game.audio.music('boss');
   ride.cruise();
+  ride.barks = ['Lenny, stop drooling on the roof!', 'Sheila, your TAIL.', 'Nobody touch the bananas. I\'m looking at you, Gary.'];
   await K.wait(0.5);
   ui.banner('FINAL FARE', 'The Whole Gang', 'Robo-Taxi Rumble', 2.8);
   await K.wait(1.2);
@@ -193,6 +194,7 @@ export async function finale(game) {
     await K.say('sheila', 'Kevin! We do NOT bite mayors! ...Good job though.');
   }
   // ---- Ending ----
+  ui.objective(null);
   game.audio.music('victory');
   game.audio.play('cheer');
   ui.banner('NEO-SERENGETI IS SAVED', 'Animal Cabs Forever!', 'The rank lives on', 3.2);

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { Place, pad } from './kit.js';
-import { toon, glowMat, drawTexture, neonText } from '../core/textures.js';
+import { toon, glowMat, drawTexture, neonText, toonGradient } from '../core/textures.js';
 import { placeCenter, streetPos } from '../world/layout.js';
 import { createCharacter } from '../world/characters.js';
 
@@ -23,7 +23,17 @@ export function buildSpire(game) {
   };
   add(0, 0, 0, 34, 120, 34, shell);
   add(0, 120, 0, 28, 180, 28, shell);
-  add(0, R, 0, 22, TOP - R - 1, 22, white);
+  const coreTex = drawTexture(256, 256, (g, w) => {
+    g.fillStyle = '#d8dce8'; g.fillRect(0, 0, w, w);
+    g.strokeStyle = '#a8aec0'; g.lineWidth = 3;
+    for (let y = 0; y < w; y += 32) { g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke(); }
+    for (let x = 0; x < w; x += 64) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, w); g.stroke(); }
+    g.fillStyle = '#ff2a3a';
+    for (let y = 16; y < w; y += 64) for (let x = 24; x < w; x += 64) g.fillRect(x, y, 16, 6);
+  });
+  coreTex.wrapS = coreTex.wrapT = THREE.RepeatWrapping;
+  coreTex.repeat.set(2, 2);
+  add(0, R, 0, 22, TOP - R - 1, 22, new THREE.MeshToonMaterial({ map: coreTex, gradientMap: toonGradient() }));
   // Red stripes & rings
   for (let y = 20; y < R; y += 24) {
     const ring = new THREE.Mesh(new THREE.TorusGeometry(y < 120 ? 25 : 21, 0.5, 6, 48), glowMat(0xff2030, 2.2));
@@ -39,10 +49,10 @@ export function buildSpire(game) {
     P.group.add(eye);
   }
   const antenna = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 1.5, 60, 8), white);
-  antenna.position.set(c.x, TOP + 30, c.z);
+  antenna.position.set(c.x, TOP + 30, c.z - 13);
   P.group.add(antenna);
   const tip = new THREE.Mesh(new THREE.SphereGeometry(2, 12, 10), glowMat(0xff2030, 4, { unique: true }));
-  tip.position.set(c.x, TOP + 61, c.z);
+  tip.position.set(c.x, TOP + 61, c.z - 13);
   P.group.add(tip);
   P.tip = tip;
 
@@ -159,7 +169,7 @@ export function buildSpire(game) {
     pre: new THREE.Vector3(c.x + 30, R + 1, c.z + 29.6),
     entry: new THREE.Vector3(c.x + 30, 72, streetPos(8)),
   };
-  P.spawn = { pos: new THREE.Vector3(c.x, R, c.z + 24), yaw: 0 };
+  P.spawn = { pos: new THREE.Vector3(c.x, R, c.z + 24), yaw: Math.PI / 2 };
   P.topSpawn = { pos: new THREE.Vector3(c.x, TOP, c.z + 8), yaw: 0 };
   const light = new THREE.PointLight(0xff8090, 300, 80, 1.3);
   light.position.set(c.x, TOP + 10, c.z + 10);

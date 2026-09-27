@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { Place, pad } from './kit.js';
-import { toon, glowMat, drawTexture, neonText } from '../core/textures.js';
+import { toon, glowMat, drawTexture, neonText, toonGradient } from '../core/textures.js';
 import { placeCenter, streetPos } from '../world/layout.js';
 import { createCharacter } from '../world/characters.js';
 import { clamp, rand, pick, damp } from '../core/util.js';
@@ -34,8 +34,20 @@ export function buildCarnival(game) {
 
   // Platforms
   P.plats = {};
+  const floorTex = (a, b) => drawTexture(256, 256, (g, w) => {
+    const n = 16;
+    for (let i = 0; i < n; i++) {
+      g.fillStyle = i % 2 ? a : b;
+      g.beginPath(); g.moveTo(w / 2, w / 2); g.arc(w / 2, w / 2, w / 2, (i / n) * Math.PI * 2, ((i + 1) / n) * Math.PI * 2); g.fill();
+    }
+    g.fillStyle = '#ffd23f'; g.beginPath(); g.arc(w / 2, w / 2, w * 0.1, 0, Math.PI * 2); g.fill();
+    g.strokeStyle = 'rgba(255,255,255,0.35)'; g.lineWidth = 4; g.beginPath(); g.arc(w / 2, w / 2, w * 0.46, 0, Math.PI * 2); g.stroke();
+  });
+  const floors = [floorTex('#3a2458', '#4a2d70'), floorTex('#26305a', '#2f3c70'), floorTex('#3d2046', '#4d2858')];
+  const side = toon(0x2d2446);
+  let fi = 0;
   for (const [k, [x, z, r, y, rim]] of Object.entries(PLATS)) {
-    const mat = toon(k === 'B' ? 0x3a2458 : 0x2d2446);
+    const mat = [side, new THREE.MeshToonMaterial({ map: floors[fi++ % floors.length], gradientMap: toonGradient() }), side];
     const d = P.disc(c.x + x, Y + y, c.z + z, r, mat, { rim, thick: 1.2 });
     P.plats[k] = { key: k, x: c.x + x, z: c.z + z, r, y: Y + y, group: d };
   }
@@ -345,6 +357,10 @@ export class KidAI {
       this.pos.y = this.plat.y;
       ch.root.position.copy(this.pos);
       ch.root.position.y += hop;
+      if (!this.kevin && this.state === 'dizzy') {
+        this.dizzyT -= dt;
+        if (this.dizzyT <= 0) this.state = 'idle';
+      }
       if (this.kevin) {
         const dist = Math.hypot(player.pos.x - this.pos.x, player.pos.z - this.pos.z) + Math.max(0, Math.abs(player.pos.y - this.pos.y) - 2);
         if (this.state === 'eat') {

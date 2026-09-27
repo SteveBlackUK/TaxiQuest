@@ -15,6 +15,8 @@ async function boot() {
   const game = new Game();
   window.game = game;
   window.THREE = THREE;
+  if (params.has('timescale')) game.timeScale = parseFloat(params.get('timescale')) || 1;
+  if (params.has('lowfx')) game.state.settings.quality = 'low';
   if (params.has('autoplay')) game.autoplay = { delay: parseFloat(params.get('autoplay')) || 0.25 };
   await game.init((m) => { bootMsg.textContent = m; });
   game.start();

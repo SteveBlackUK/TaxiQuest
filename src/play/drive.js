@@ -22,15 +22,15 @@ export class Drive {
     this._q = [];
     // Holographic arrow on the dash pointing at the next checkpoint.
     this.arrow = new THREE.Group();
-    const cone = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.18, 12), glowMat(0x33f0ff, 2.5));
+    const arrowMat = glowMat(0xffd23f, 1.5);
+    const cone = new THREE.Mesh(new THREE.ConeGeometry(0.07, 0.16, 4), arrowMat);
     cone.rotation.x = -Math.PI / 2;
-    cone.position.z = -0.06;
+    cone.position.z = -0.1;
     this.arrow.add(cone);
-    const tail = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.14, 8), glowMat(0x33f0ff, 2.5));
-    tail.rotation.x = -Math.PI / 2;
-    tail.position.z = 0.06;
-    this.arrow.add(tail);
-    this.arrow.position.set(-0.2, 1.3, -1.25);
+    const shaft = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.035, 0.16), arrowMat);
+    shaft.position.z = 0.03;
+    this.arrow.add(shaft);
+    this.arrow.position.set(-0.5, 1.22, -1.05);
     this.arrow.visible = false;
     this.taxi.body.add(this.arrow);
   }
@@ -46,6 +46,7 @@ export class Drive {
     this.bumps = 0;
     this.taxi.root.visible = true;
     this.taxi.setInside(true);
+    this.taxi.setDriving(true);
     this.taxi.anchors.eyeDriver.add(g.camera);
     g.camera.position.set(0, 0, 0);
     g.camera.rotation.set(0, 0, 0);
@@ -72,6 +73,7 @@ export class Drive {
     g.audio.setEngine(0, 0);
     this.arrow.visible = false;
     this.taxi.setInside(false);
+    this.taxi.setDriving(false);
     this.clearCourse();
   }
 
@@ -203,7 +205,7 @@ export class Drive {
 
     // Course
     const c = this.course;
-    if (c) {
+    if (c && c.idx < c.points.length) {
       const target = c.points[c.idx];
       const ring = c.rings[c.idx];
       ring.rotation.z += dt;

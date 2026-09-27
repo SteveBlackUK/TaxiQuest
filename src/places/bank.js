@@ -36,7 +36,8 @@ export function buildBankExterior(game) {
   // Landing pad
   const padY = 46;
   P.box(-311.5, padY - 1, cz, 13, 1, 14, toon(0x3a3350));
-  P.box(-311.5, padY - 0.02, cz, 11, 0.06, 12, glowMat(0xffd23f, 0.6), { collide: false });
+  P.box(-311.5, padY - 0.02, cz, 11, 0.06, 12, glowMat(0xb8861a, 0.45), { collide: false });
+  P.box(-311.5, padY + 0.02, cz, 12, 0.02, 1.6, toon(0xa01830), { collide: false });
   P.railing(-318, cz - 7, -305, cz - 7, padY, { color: 0xffd23f });
   P.railing(-318, cz + 7, -305, cz + 7, padY, { color: 0xffd23f });
   // Doors
@@ -140,7 +141,7 @@ export function buildBankInterior(game) {
   B(17, -32.5, 21, -35.5, 0, 0.9, toon(0x5a3a2a), { tag: 'low' });  // desk
   B(20.5, -36.8, 22.5, -38.5, 0, 0.6, toon(0x8a2040), { tag: 'low' }); // sofa-ish
   P.sign('MANAGER · MR. PORKSWORTH', O.x + 22.9, O.y + 3.4, O.z - 34, -Math.PI / 2, { w: 5.5, h: 0.9, color: '#ff3d8b' });
-  P.sign('EMPLOYEE OF THE MONTH: TELL-R', O.x + 18, O.y + 3.6, O.z - 27.9, 0, { w: 5, h: 0.9, color: '#33f0ff', size: 60 });
+  P.sign('EMPLOYEE OF THE MONTH: TELL-R', O.x + 18, O.y + 3.6, O.z - 28.06, Math.PI, { w: 5, h: 0.9, color: '#33f0ff', size: 60 });
   const keycard = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.04, 0.32), glowMat(0x33f0ff, 2.5));
   keycard.position.copy(L(19, -34)).add(new THREE.Vector3(0, 0.95, 0));
   P.group.add(keycard);
@@ -163,7 +164,13 @@ export function buildBankInterior(game) {
     B(x - 0.15, -44.3, x + 0.15, -44, 0, 2.6, toon(0x333333), { collide: false });
     B(x - 0.15, -50, x + 0.15, -49.7, 0, 2.6, toon(0x333333), { collide: false });
   }
-  P.sign('CROUCH [C] UNDER · JUMP OVER', O.x - 2.5, O.y + 3.6, O.z - 44.1, 0, { w: 6, h: 0.8, color: '#ff4d4d', size: 56 });
+  // Hiding spots in the laser hall
+  B(5.3, -50, 6.9, -48.5, 0, H, marble, { tag: 'wall' });
+  B(-9.3, -50, -7.7, -48.5, 0, H, marble, { tag: 'wall' });
+  B(-0.3, -45.6, 1.5, -44.5, 0, 1.0, toon(0x6a4a2a), { tag: 'low' });
+  B(0.0, -45.3, 1.2, -44.5, 1.0, 0.5, toon(0x7a5a3a), { tag: 'low' });
+  P.sign('STAFF ONLY', O.x + 11, O.y + 4.6, O.z - 23.95, 0, { w: 3.4, h: 0.7, color: '#ff4d4d', size: 70 });
+  P.sign('CROUCH [C] UNDER · JUMP OVER', O.x - 2.5, O.y + 3.6, O.z - 44.56, Math.PI, { w: 6, h: 0.8, color: '#ff4d4d', size: 56 });
 
   // Vault (x -30..-14, z -56..-38)
   wall(-30.5, -38, -14, -37.5); wall(-30.5, -56.5, -14, -56); wall(-30.5, -56, -30, -38);
@@ -253,6 +260,15 @@ export function buildBankInterior(game) {
     P.sheep.push(s);
   });
 
+  // The lobby is public: you're just a customer there, unless you're behind the counter or carrying loot.
+  P.loot = false;
+  P.isRestricted = (pos) => {
+    const lx = pos.x - O.x, lz = pos.z - O.z;
+    if (P.loot) return true;
+    const inLobby = lx > -14 && lx < 14 && lz < 0.5 && lz > -24;
+    const behindCounter = lz < -19.4 && lx < 3.4;
+    return !inLobby || behindCounter;
+  };
   P.spawn = { pos: L(0, -2), yaw: 0 };
   P.exitPos = L(0, -0.5).add(new THREE.Vector3(0, 1.4, 0));
   P.L = L;
@@ -370,8 +386,8 @@ export class Guard {
           this.move(d, Math.min(dist, this.speed * dt));
         }
       }
-      // Suspicion
-      if (this.canSee(player, r)) {
+      // Suspicion (only where you're not supposed to be)
+      if (this.P.isRestricted(player.pos) && this.canSee(player, r)) {
         const dist = Math.hypot(player.pos.x - this.pos.x, player.pos.z - this.pos.z);
         const nerve = this.game.state.stat('nerve');
         this.sus += dt * (1.35 - 0.85 * dist / r) / (1 + (nerve - 1) * 0.25);

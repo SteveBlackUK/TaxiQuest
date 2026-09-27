@@ -18,6 +18,7 @@ export async function fareLenny(game) {
   game.taxi.setMeterRate(0.2);
   game.audio.music('lenny');
   ride.cruise();
+  ride.barks = ['...nice... night...', '...honk...', '...is it... Tuesday...?'];
   ride.targetSpeed = 9;
   await K.wait(0.6);
   ui.banner('FARE #4', 'Lenny the Sloth', 'Asleep at the Wheel', 2.6);

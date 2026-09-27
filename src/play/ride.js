@@ -136,6 +136,8 @@ export class Ride {
     this.lookOverride = null;
     this.camOffset = null;
     this.driverLookOverride = null;
+    this.barks = null;
+    this.barkT = 10;
     this.taxi.root.visible = true;
     this.taxi.setDoor(false);
     this.taxi.resetFare();
@@ -359,6 +361,15 @@ export class Ride {
     } else this.bounceY = damp(this.bounceY, 0, 4, dt);
     this.applyTransform(dt);
     this.taxi.update(dt, this.speed);
+    // Ambient chatter and honks while cruising
+    if (this.passenger && this.speed > 8 && !this.game.ui.line && !this.game.chase.active) {
+      this.barkT = (this.barkT ?? 12) - dt;
+      if (this.barkT <= 0) {
+        this.barkT = 14 + Math.random() * 10;
+        if (Math.random() < 0.6) this.game.audio.play('honk', { vol: 0.5, pan: Math.random() * 2 - 1 });
+        if (this.barks && this.barks.length && this.driver) this.game.ui.bark(this.driver.cast?.name?.toUpperCase() || 'DRIVER', this.barks[Math.floor(Math.random() * this.barks.length)], 3.5);
+      }
+    }
     if (this.passenger) this.game.audio.setEngine(1, clamp(this.speed / 60, 0, 1));
     else this.game.audio.setEngine(0, 0);
     if (this.driver) {

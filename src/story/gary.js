@@ -14,6 +14,7 @@ export async function fareGary(game) {
   game.taxi.tv('ads', ['LLAMA LOANS: No credit? No problem. No escape.', 'GALACTIC RESERVE: Your money is safe with us!*', '*Terms and conditions apply.']);
   game.audio.music('heist');
   ride.cruise();
+  ride.barks = ['Don\'t look at the cops. Don\'t look at the cops.', 'Nice night for a crime.', 'You ever notice the moon looks like a banana? No? Just me.'];
   await K.wait(0.6);
   ui.banner('FARE #3', 'Gary the Gorilla', 'The Big Banana Job', 2.6);
   await K.wait(1.3);
@@ -143,7 +144,7 @@ async function runHeist(game, attempt) {
   const guards = [
     new Guard(g, B, [[-11, -5], [11, -5], [11, -13.5], [-11, -13.5]], { speed: 1.8 }),
     new Guard(g, B, [[11, -26], [11, -42.5]], { speed: 1.7 }),
-    new Guard(g, B, [[-12, -47], [8, -47]], { speed: 1.6 }),
+    new Guard(g, B, [[-7, -47], [9, -47]], { speed: 1.5 }),
   ];
   game.dialogue.register('teller', B.teller);
   game.dialogue.define('sheep', { name: 'Sheep', species: 'Customer · In line since Tuesday', voice: 'sheep' });
@@ -163,7 +164,9 @@ async function runHeist(game, attempt) {
   };
   objective();
   ui.hint('<span class="kbd">C</span> crouch (harder to see, hide behind counters) · <span class="kbd">SHIFT</span> sprint');
+  B.loot = false;
   const updateSpeed = () => {
+    B.loot = S.bags > 0 || S.banana;
     foot.speedMul = 1 - S.bags * 0.05 - (S.banana ? 0.12 : 0);
     if (S.bags > 0 || S.banana) {
       const held = new THREE.Group();
@@ -281,10 +284,16 @@ async function runHeist(game, attempt) {
       if (game.ui.line) return false;
       S.time += dt;
       for (const gd of guards) gd.update(dt, foot, S.alarm);
+      const restricted = B.isRestricted(foot.pos);
+      if (restricted !== S.restricted) {
+        S.restricted = restricted;
+        if (!S.alarm) ui.hint(restricted ? '<b style="color:#ff4d4d">RESTRICTED AREA</b> · stay out of the flashlights · <span class="kbd">C</span> crouch' : '<b style="color:#6dff8a">PUBLIC LOBBY</b> · act natural, nobody cares (yet)');
+      }
       // Detection meter
       const sus = Math.max(...guards.map((gd) => gd.sus));
       if (!S.alarm) {
-        ui.meter('detect', { label: sus > 0.6 ? 'SPOTTED!' : 'DETECTION', value: sus, color: sus > 0.6 ? '#ff4d4d' : '#ffd23f' });
+        if (restricted || sus > 0.01) ui.meter('detect', { label: sus > 0.6 ? 'SPOTTED!' : 'DETECTION', value: sus, color: sus > 0.6 ? '#ff4d4d' : '#ffd23f' });
+        else ui.meter('detect', { value: null });
         if (sus >= 1) triggerAlarm('seen');
       } else ui.meter('detect', { value: null });
       // Lasers

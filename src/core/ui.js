@@ -389,6 +389,15 @@ export class UI {
   }
 
   controlsHtml() {
+    if (this.game.touch) {
+      return `<div class="controls-grid">
+      <span class="kbd">STICK</span><span>Walk (or fly)</span>
+      <span class="kbd">DRAG</span><span>Look around / steer</span>
+      <span class="kbd">TAP</span><span>Throw, catch, press things, advance dialogue</span>
+      <span class="kbd">USE</span><span>Interact</span>
+      <span class="kbd">FLOSS</span><span>Throw Space Floss</span>
+    </div>`;
+    }
     return `<div class="controls-grid">
       <span class="kbd">MOUSE</span><span>Look around / aim</span>
       <span class="kbd">W A S D</span><span>Walk (or fly, when you're driving)</span>

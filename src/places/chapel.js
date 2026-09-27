@@ -14,11 +14,13 @@ export function buildChapel(game) {
   // Cloud
   const cloudM = toon(0xf4eeff, { emissive: 0x2a2040 });
   const puffs = [];
-  for (let i = 0; i < 38; i++) {
-    const a = (i / 38) * Math.PI * 2 * 3;
-    const r = 6 + (i % 5) * 4;
-    const s = new THREE.Mesh(new THREE.SphereGeometry(4 + (i % 4) * 1.5, 12, 10), cloudM);
-    s.position.set(cx + Math.cos(a) * r, Y - 3 - (i % 3) * 1.5, cz + Math.sin(a) * r);
+  for (let i = 0; i < 44; i++) {
+    const a = (i / 44) * Math.PI * 2 * 3 + i * 0.3;
+    const r = 5 + (i % 6) * 3.6;
+    const rad = 4 + (i % 4) * 1.4;
+    const s = new THREE.Mesh(new THREE.SphereGeometry(rad, 12, 10), cloudM);
+    s.scale.set(1.3, 0.45, 1.3);
+    s.position.set(cx + Math.cos(a) * r, Y - 2.2 - rad * 0.45 - (i % 3) * 1.2, cz + Math.sin(a) * r);
     P.group.add(s);
     puffs.push(s);
   }
